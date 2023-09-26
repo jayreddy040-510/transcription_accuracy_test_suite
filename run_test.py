@@ -3,27 +3,20 @@ import sys
 import torch
 import jiwer
 from fuzzywuzzy import fuzz
-from transformers import Wav2Vec2ForCTC, Wav2Vec2Tokenizer
+from transformers import pipeline
 
-if "--path" not in sys.argv and "--p" not in sys.argv:	
-	print("you need to specify a file with --p or --path", flush=True)
-	sys.exit(1)
+if "--path" not in sys.argv and "--p" not in sys.argv:
+    print("you need to specify a file with --p or --path", flush=True)
+    sys.exit(1)
 
 for idx, arg in enumerate(sys.argv):
-	if arg == "--p" or arg == "--path":
-		audio_file_path = sys.argv[idx + 1] 
-
-# audio_file_path = "path_to_audio_file.wav"
+    if arg == "--p" or arg == "--path":
+        audio_file_path = sys.argv[idx + 1]
 
 def transcribe(model_name, audio_file_path):
-    model = Wav2Vec2ForCTC.from_pretrained(model_name)
-    tokenizer = Wav2Vec2Tokenizer.from_pretrained(model_name)
-    audio_input = torch.tensor([tokenizer(audio_file_path, return_tensors="pt").input_values])
-    with torch.no_grad():
-		logits = model(audio_input).logits
-		predicted_ids = torch.argmax(logits, dim=-1)
-		transcription = tokenizer.batch_decode(predicted_ids)
-	return transcription[0]
+    transcriber = pipeline("automatic-speech-recognition", model=model_name) 
+    ret = transcriber(audio_file_path)
+    return ret
 
 transcription_large_v2 = transcribe("openai/whisper-large-v2", audio_file_path)
 transcription_medium = transcribe("openai/whisper-medium", audio_file_path)
