@@ -46,26 +46,16 @@ transformation = jiwer.Compose([
     jiwer.RemovePunctuation()
 ])
 
-# ... [previous code]
-
-# Apply transformations
 transformed_large_v2 = transformation(transcription_large_v2['text'])
 transformed_medium = transformation(transcription_medium['text'])
 transformed_small = transformation(transcription_small['text'])
 transformed_tiny = transformation(transcription_tiny['text'])
 
-# Split the transformed transcriptions into lists of words
 transformed_large_v2 = transformed_large_v2.split()
 transformed_medium = transformed_medium.split()
 transformed_small = transformed_small.split()
 transformed_tiny = transformed_tiny.split()
 
-print(transformed_large_v2)
-print(transformed_medium)
-print(transformed_small)
-print(transformed_tiny)
-
-# Calculate WER
 wer_medium = jiwer.wer(transformed_large_v2, transformed_medium)
 wer_small = jiwer.wer(transformed_large_v2, transformed_small)
 wer_tiny = jiwer.wer(transformed_large_v2, transformed_tiny)
