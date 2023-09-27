@@ -23,6 +23,11 @@ transcription_medium = transcribe("openai/whisper-medium", audio_file_path)
 transcription_small = transcribe("openai/whisper-small", audio_file_path)
 transcription_tiny = transcribe("openai/whisper-tiny", audio_file_path)
 
+print(f"transcription_large_v2: {transcription_large_v2}", flush=True)
+print(f"transcription_medium: {transcription_medium}", flush=True)
+print(f"transcription_small: {transcription_small}", flush=True)
+print(f"transcription_tiny: {transcription_tiny}", flush=True)
+
 def compare_transcriptions(reference, target):
     return fuzz.ratio(reference, target)
 
@@ -41,9 +46,29 @@ transformation = jiwer.Compose([
     jiwer.RemovePunctuation()
 ])
 
-wer_medium = jiwer.wer(transcription_large_v2, transcription_medium, truth_transform=transformation, hypothesis_transform=transformation)
-wer_small = jiwer.wer(transcription_large_v2, transcription_small, truth_transform=transformation, hypothesis_transform=transformation)
-wer_tiny = jiwer.wer(transcription_large_v2, transcription_tiny, truth_transform=transformation, hypothesis_transform=transformation)
+# ... [previous code]
+
+# Apply transformations
+transformed_large_v2 = transformation(transcription_large_v2['text'])
+transformed_medium = transformation(transcription_medium['text'])
+transformed_small = transformation(transcription_small['text'])
+transformed_tiny = transformation(transcription_tiny['text'])
+
+# Split the transformed transcriptions into lists of words
+transformed_large_v2 = transformed_large_v2.split()
+transformed_medium = transformed_medium.split()
+transformed_small = transformed_small.split()
+transformed_tiny = transformed_tiny.split()
+
+print(transformed_large_v2)
+print(transformed_medium)
+print(transformed_small)
+print(transformed_tiny)
+
+# Calculate WER
+wer_medium = jiwer.wer(transformed_large_v2, transformed_medium)
+wer_small = jiwer.wer(transformed_large_v2, transformed_small)
+wer_tiny = jiwer.wer(transformed_large_v2, transformed_tiny)
 
 print(f"WER (Medium vs Large-v2): {wer_medium}", flush=True)
 print(f"WER (Small vs Large-v2): {wer_small}", flush=True)
